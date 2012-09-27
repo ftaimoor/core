@@ -16,20 +16,16 @@
  */
 package org.apache.wicket.portlet;
 
-import javax.portlet.PortletConfig;
-import javax.portlet.PortletMode;
-import javax.portlet.PortletPreferences;
-import javax.portlet.PortletRequest;
-import javax.portlet.PortletResponse;
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.wicket.Application;
 import org.apache.wicket.ThreadContext;
 import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.http.WebRequest;
+
+import javax.portlet.*;
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * This class serves as a shortcut to all Portlet related attributes
@@ -37,65 +33,65 @@ import org.apache.wicket.request.http.WebRequest;
  * @author Peter Pastrnak
  */
 public class ThreadPortletContext {
-	public static ServletContext getServletContext() {
-		Application application = ThreadContext.getApplication();
-		return (application != null) ? ((WebApplication) application).getServletContext() : null;
-	}
+    public static ServletContext getServletContext() {
+        Application application = ThreadContext.getApplication();
+        return (application != null) ? ((WebApplication) application).getServletContext() : null;
+    }
 
-	public static HttpServletRequest getHttpServletRequest() {
-		return (HttpServletRequest) ThreadContext.getRequestCycle().getRequest().getContainerRequest();
-	}
-	
-	public static HttpServletResponse getHttpServletResponse() {
-		return (HttpServletResponse) ThreadContext.getRequestCycle().getResponse().getContainerResponse();
-	}
-	
-	public static PortletConfig getPortletConfig() {
-		HttpServletRequest servletRequest = getHttpServletRequest();
-		return (servletRequest != null) ? (PortletConfig) servletRequest.getAttribute("javax.portlet.config") : null;
-	}
-	
-	public static PortletRequest getPortletRequest() {
-		HttpServletRequest servletRequest = getHttpServletRequest();
-		return (servletRequest != null) ? (PortletRequest) servletRequest.getAttribute("javax.portlet.request") : null;
-	}
-	
-	public static PortletResponse getPortletResponse() {
-		HttpServletRequest servletRequest = getHttpServletRequest();
-		return (servletRequest != null) ? (PortletResponse) servletRequest.getAttribute("javax.portlet.response") : null;
-	}
-	
-	public static PortletMode getPortletMode() {
-		PortletRequest portletRequest = getPortletRequest();
-		return (portletRequest != null) ? portletRequest.getPortletMode() : null;
-	}
-	
-	public static PortletPreferences getPortletPreferences() {
-		PortletRequest portletRequest = getPortletRequest();
-		return (portletRequest != null) ? portletRequest.getPreferences() : null;
-	}
-	
-	public static String getNamespace() {
-		PortletResponse portletResponse = getPortletResponse();
-		return (portletResponse != null) ? portletResponse.getNamespace() : "";
-	}
-	
-	public static String getWindowID() {
-		PortletRequest portletRequest = getPortletRequest();
-		return (portletRequest != null) ? portletRequest.getWindowID() : null;
-	}
-	
-	public static boolean isAjax() {
-		RequestCycle requestCycle = ThreadContext.getRequestCycle();
-		return (requestCycle != null) ? ((WebRequest) requestCycle.getRequest()).isAjax() : false;
-	}
-	
-	public static boolean isResourceRequest() {
-		PortletRequest portletRequest = getPortletRequest();
-		return (portletRequest != null) && (portletRequest.getAttribute(PortletRequest.LIFECYCLE_PHASE).equals(PortletRequest.RESOURCE_PHASE));
-	}
-	
-	public static boolean isEmbedded() {
-		return !((isAjax()) || (isResourceRequest()));
-	}
+    public static HttpServletRequest getHttpServletRequest() {
+        return (HttpServletRequest) ThreadContext.getRequestCycle().getRequest().getContainerRequest();
+    }
+
+    public static HttpServletResponse getHttpServletResponse() {
+        return (HttpServletResponse) ThreadContext.getRequestCycle().getResponse().getContainerResponse();
+    }
+
+    public static PortletConfig getPortletConfig() {
+        HttpServletRequest servletRequest = getHttpServletRequest();
+        return (servletRequest != null) ? (PortletConfig) servletRequest.getAttribute("javax.portlet.config") : null;
+    }
+
+    public static PortletRequest getPortletRequest() {
+        HttpServletRequest servletRequest = getHttpServletRequest();
+        return (servletRequest != null) ? (PortletRequest) servletRequest.getAttribute("javax.portlet.request") : null;
+    }
+
+    public static PortletResponse getPortletResponse() {
+        HttpServletRequest servletRequest = getHttpServletRequest();
+        return (servletRequest != null) ? (PortletResponse) servletRequest.getAttribute("javax.portlet.response") : null;
+    }
+
+    public static PortletMode getPortletMode() {
+        PortletRequest portletRequest = getPortletRequest();
+        return (portletRequest != null) ? portletRequest.getPortletMode() : null;
+    }
+
+    public static PortletPreferences getPortletPreferences() {
+        PortletRequest portletRequest = getPortletRequest();
+        return (portletRequest != null) ? portletRequest.getPreferences() : null;
+    }
+
+    public static String getNamespace() {
+        PortletResponse portletResponse = getPortletResponse();
+        return (portletResponse != null) ? portletResponse.getNamespace() : "";
+    }
+
+    public static String getWindowID() {
+        PortletRequest portletRequest = getPortletRequest();
+        return (portletRequest != null) ? portletRequest.getWindowID() : null;
+    }
+
+    public static boolean isAjax() {
+        RequestCycle requestCycle = ThreadContext.getRequestCycle();
+        return (requestCycle != null) && ((WebRequest) requestCycle.getRequest()).isAjax();
+    }
+
+    public static boolean isResourceRequest() {
+        PortletRequest portletRequest = getPortletRequest();
+        return (portletRequest != null) && (portletRequest.getAttribute(PortletRequest.LIFECYCLE_PHASE).equals(PortletRequest.RESOURCE_PHASE));
+    }
+
+    public static boolean isEmbedded() {
+        return !((isAjax()) || (isResourceRequest()));
+    }
 }
