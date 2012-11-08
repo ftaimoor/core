@@ -29,7 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  * This class serves as a shortcut to all Portlet related attributes
- *
+ * 
  * @author Peter Pastrnak
  */
 public class ThreadPortletContext {
@@ -58,7 +58,8 @@ public class ThreadPortletContext {
 
     public static PortletResponse getPortletResponse() {
         HttpServletRequest servletRequest = getHttpServletRequest();
-        return (servletRequest != null) ? (PortletResponse) servletRequest.getAttribute("javax.portlet.response") : null;
+        return (servletRequest != null) ? (PortletResponse) servletRequest.getAttribute("javax.portlet.response")
+                : null;
     }
 
     public static PortletMode getPortletMode() {
@@ -88,7 +89,8 @@ public class ThreadPortletContext {
 
     public static boolean isResourceRequest() {
         PortletRequest portletRequest = getPortletRequest();
-        return (portletRequest != null) && (portletRequest.getAttribute(PortletRequest.LIFECYCLE_PHASE).equals(PortletRequest.RESOURCE_PHASE));
+        return (portletRequest != null)
+                && (portletRequest.getAttribute(PortletRequest.LIFECYCLE_PHASE).equals(PortletRequest.RESOURCE_PHASE));
     }
 
     public static boolean isEmbedded() {

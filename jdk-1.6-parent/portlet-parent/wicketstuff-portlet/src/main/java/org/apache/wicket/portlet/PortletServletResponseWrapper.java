@@ -26,11 +26,11 @@ import java.util.Locale;
 
 /**
  * General class for all Portal responses, wrapping Servlet responses with Portal specific functionality.
- * Records various settings in the {@link ResponseState}, like the redirect location, which when running
- * as a portlet Wicket uses the {@link org.apache.wicket.settings.IRequestCycleSettings.RenderStrategy#REDIRECT_TO_RENDER}
- * strategy, is used in the render phase to know what Wicket url to request Wicket Core to render.
- * TODO rephrase - not clear
- *
+ * Records various settings in the {@link ResponseState}, like the redirect location.
+ * These, when running Wicket as a portlet (using the
+ * {@link org.apache.wicket.settings.IRequestCycleSettings.RenderStrategy#REDIRECT_TO_RENDER} strategy), are used in the
+ * render phase to know what Wicket url to request for render from wicket-core.
+ * 
  * @author Ate Douma
  * @author <a href="http://sebthom.de/">Sebastian Thomschke</a>
  * @see WicketPortlet#processActionResponseState

@@ -20,10 +20,10 @@ import org.apache.wicket.response.filter.IResponseFilter;
 import org.apache.wicket.util.string.AppendingStringBuffer;
 
 /**
- * This filter removes html page top level markup elements like <code>&lt;html&gt;</code>, <code>&lt;head&gt</code>
- * and <code>&lt;body&gt;</code>. The filter is configured automatically by WicketFilter if it detects the application
+ * This filter removes html page top level markup elements like <code>&lt;html&gt;</code>, <code>&lt;head&gt</code> and
+ * <code>&lt;body&gt;</code>. The filter is configured automatically by WicketFilter if it detects the application
  * is (potentially) invoked as a Portlet.
- *
+ * 
  * @author Ate Douma
  */
 public class PortletInvalidMarkupFilter implements IResponseFilter {
@@ -44,10 +44,10 @@ public class PortletInvalidMarkupFilter implements IResponseFilter {
     /**
      * Removes entire html fragments from the response buffer (inclusive of
      * fragment body).
-     *
+     * 
      * @param responseBuffer the buffer to delete from
-     * @param prefix         the beginning string to delete
-     * @param postfix        the end string to delete
+     * @param prefix the beginning string to delete
+     * @param postfix the end string to delete
      */
     private void deleteFragment(AppendingStringBuffer responseBuffer, String prefix, String postfix) {
         int startIndex, endIndex;
@@ -61,9 +61,9 @@ public class PortletInvalidMarkupFilter implements IResponseFilter {
     /**
      * Finds and removes the opening and closing tag, if it exists, from the
      * responseBuffer.
-     *
+     * 
      * @param responseBuffer the buffer to search
-     * @param tagName        the tag to delete
+     * @param tagName the tag to delete
      */
     private void deleteOpenTag(AppendingStringBuffer responseBuffer, String tagName) {
         int startIndex, endIndex;
@@ -76,7 +76,8 @@ public class PortletInvalidMarkupFilter implements IResponseFilter {
                  * FIXME if the closing brace of the element cannot be found - doesn't that mean that the entire
                  * response fragment is invalid and we should throw exception here? or are we just not making
                  * that our problem? wait - doesn't that mean that the fragment is also effectively empty if there
-                 * are no further '>' chars? throw new MarkupException("Cannot find end of element tag named: " + tagName);
+                 * are no further '>' chars? throw new MarkupException("Cannot find end of element tag named: " +
+                 * tagName);
                  */
             }
             // remove closing tag, if it exists

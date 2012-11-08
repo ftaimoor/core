@@ -16,6 +16,8 @@
  */
 package org.apache.wicket.portlet;
 
+import org.slf4j.LoggerFactory;
+
 import javax.portlet.MimeResponse;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
@@ -34,8 +36,8 @@ import java.util.concurrent.atomic.AtomicLong;
  * Temporarily holds the current state of a Wicket response when invoked from WicketPortlet: buffer, headers,
  * state and the redirect location to be processed afterwards within WicketPortlet
  * <p/>
- * TODO decouple and cleanup
- *
+ * TODO needs serious decoupling and cleanup
+ * 
  * @author Ate Douma
  * @author Peter Pastrnak
  */
@@ -77,13 +79,11 @@ public class ResponseState {
     /**
      * FIXME javadoc
      * <p/>
-     * Stores the effective wicket url which is used by {@link WicketPortlet} in
-     * the view phase to request a render from wicket core.
-     *
+     * Stores the effective wicket url which is used by {@link WicketPortlet} in the view phase to request a render from
+     * wicket core.
+     * 
      * @see org.apache.wicket.settings.IRequestCycleSettings.RenderStrategy#REDIRECT_TO_RENDER
-     * @see WicketFilterPortletHelper#initFilter  ?? TODO explain where is this from
      */
-    @SuppressWarnings("JavadocReference")
     private String redirectLocation;
 
     public ResponseState(PortletRequest request, PortletResponse response, File responseBufferFolder) {
@@ -557,10 +557,9 @@ public class ResponseState {
                 try {
                     resourceResponse.setContentLength(contentLength);
                 } catch (UnsupportedOperationException usoe) {
-                    // TODO: temporary "fix" for JBoss Portal which doesn't
-                    // yet
-                    // support this
-                    // (although required by the Portlet API 2.0!)
+                    // "fix" for JBoss Portal which doesn't yet support this (although required by the Portlet API 2.0!)
+                    LoggerFactory.getLogger(ResponseState.class).debug(
+                            "Probably vendor specific problem, ignoring for now.", usoe);
                 }
             }
         }

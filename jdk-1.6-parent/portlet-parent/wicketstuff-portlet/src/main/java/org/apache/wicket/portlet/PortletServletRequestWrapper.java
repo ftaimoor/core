@@ -16,22 +16,21 @@
  */
 package org.apache.wicket.portlet;
 
-import javax.servlet.ServletContext;
+import org.slf4j.LoggerFactory;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpSession;
 import java.io.UnsupportedEncodingException;
-import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
 
 /**
  * Wraps servlet request object with Portlet specific functionality by overriding the {@link HttpServletRequestWrapper}
- * retrieval of the context path, path info, request URI etc... to return the portal specific translations.
+ * to return the portal specific translations (e.g. retrieval of the context path, path info, request URI, etc...)
  * <p/>
- * FIXME javadoc
- *
+ * 
  * @author Ate Douma
  * @author <a href="http://sebthom.de/">Sebastian Thomschke</a>
  * @author Peter Pastrnak
@@ -39,13 +38,18 @@ import java.util.Set;
  */
 @SuppressWarnings("JavaDoc")
 public class PortletServletRequestWrapper extends HttpServletRequestWrapper {
-    private static final Set<String> HIDDEN_REQUEST_ATTRIBUTES = new HashSet<String>(Arrays.asList(
-            "javax.servlet.error.request_uri", "javax.servlet.forward.request_uri", "javax.servlet.forward.servlet_path",
-            "javax.servlet.forward.context_path", "javax.servlet.forward.query_string"));
+    private static final Set<String> HIDDEN_REQUEST_ATTRIBUTES = new HashSet<String>(5);
+    static {
+        HIDDEN_REQUEST_ATTRIBUTES.add("javax.servlet.error.request_uri");
+        HIDDEN_REQUEST_ATTRIBUTES.add("javax.servlet.forward.request_uri");
+        HIDDEN_REQUEST_ATTRIBUTES.add("javax.servlet.forward.servlet_path");
+        HIDDEN_REQUEST_ATTRIBUTES.add("javax.servlet.forward.context_path");
+        HIDDEN_REQUEST_ATTRIBUTES.add("javax.servlet.forward.query_string");
+    }
 
     /**
      * Converts from a filterPath (path with a trailing slash), to a servletPath (path with a leading slash).
-     *
+     * 
      * @param filterPath
      * @return the filterPath prefixed with a leading slash and with the trailing slash removed
      */
@@ -84,19 +88,15 @@ public class PortletServletRequestWrapper extends HttpServletRequestWrapper {
     private HttpSession session;
 
     /**
-     * FIXME javadoc
-     * <p/>
-     * <p/>
-     * Public constructor which internally builds the path info from request
-     * URI, instead of deriving it.
-     *
-     * @param context
+     * Public constructor which internally builds the path info from request URI, instead of deriving it.
+     * 
      * @param request
      * @param proxiedSession
      * @param filterPath
      */
-    public PortletServletRequestWrapper(final ServletContext context, final HttpServletRequest request, final HttpSession proxiedSession, final String filterPath) {
-        this(context, proxiedSession, request, filterPath);
+    public PortletServletRequestWrapper(final HttpServletRequest request,
+            final HttpSession proxiedSession, final String filterPath) {
+        this(proxiedSession, request, filterPath);
 
         // Liferay sometimes gives an incorrect requestURI
         final int pathInfoBegin = contextPath.length() + filterPath.length();
@@ -105,21 +105,17 @@ public class PortletServletRequestWrapper extends HttpServletRequestWrapper {
     }
 
     /**
-     * FIXME javadoc
-     * <p/>
-     * <p/>
-     * Public constructor called when not running in a portlet environment,
-     * which is passed in the path info instead of deriving it. It overrides the
-     * generated request URI from the internal constructor.
-     *
-     * @param context
+     * Public constructor called when not running in a portlet environment, which is passed in the path info instead of
+     * deriving it. It overrides the generated request URI from the internal constructor.
+     * 
      * @param request
      * @param proxiedSession
-     * @param filterPath     ???
-     * @param pathInfo       ???
+     * @param filterPath ???
+     * @param pathInfo ???
      */
-    public PortletServletRequestWrapper(final ServletContext context, final HttpServletRequest request, final HttpSession proxiedSession, final String filterPath, final String pathInfo) {
-        this(context, proxiedSession, request, filterPath);
+    public PortletServletRequestWrapper(final HttpServletRequest request,
+            final HttpSession proxiedSession, final String filterPath, final String pathInfo) {
+        this(proxiedSession, request, filterPath);
 
         this.pathInfo = pathInfo;
         // override requestURI which is setup in the protected constructor
@@ -130,13 +126,13 @@ public class PortletServletRequestWrapper extends HttpServletRequestWrapper {
      * Package private constructor which is called from either of the two public
      * constructors - sets up the various portlet specific versions of the
      * context path, servlet path, request URI etc...
-     *
-     * @param context        TODO remove
+     * 
      * @param proxiedSession
      * @param request
      * @param filterPath
      */
-    PortletServletRequestWrapper(final ServletContext context, final HttpSession proxiedSession, final HttpServletRequest request, final String filterPath) {
+    PortletServletRequestWrapper(final HttpSession proxiedSession,
+            final HttpServletRequest request, final String filterPath) {
         super(request);
 
         session = proxiedSession;
@@ -212,11 +208,11 @@ public class PortletServletRequestWrapper extends HttpServletRequestWrapper {
     public String getHeader(String name) {
         String header = super.getHeader(name);
         if (header == null) {
-            // GateIn: SimpleMultiValuedPropertyMap does not load values with equalsIgnoreCase like MimeHeaders do in Request
-            @SuppressWarnings("unchecked")
-            Enumeration<String> headerNames = this.getHeaderNames();
+            // GateIn: SimpleMultiValuedPropertyMap does not load values with equalsIgnoreCase like MimeHeaders do
+            // in Request
+            Enumeration<?> headerNames = this.getHeaderNames();
             while (headerNames.hasMoreElements()) {
-                String headerName = headerNames.nextElement();
+                String headerName = headerNames.nextElement().toString();
                 if (headerName.equalsIgnoreCase(name)) {
                     header = super.getHeader(headerName);
                     break;
@@ -230,11 +226,11 @@ public class PortletServletRequestWrapper extends HttpServletRequestWrapper {
     public Enumeration<?> getHeaders(String name) {
         Enumeration<?> headers = super.getHeaders(name);
         if (!headers.hasMoreElements()) {
-            // GateIn: SimpleMultiValuedPropertyMap does not load values with equalsIgnoreCase like MimeHeaders do in Request
-            @SuppressWarnings("unchecked")
-            Enumeration<String> headerNames = this.getHeaderNames();
+            // GateIn: SimpleMultiValuedPropertyMap does not load values with equalsIgnoreCase like MimeHeaders do
+            // in Request
+            Enumeration<?> headerNames = this.getHeaderNames();
             while (headerNames.hasMoreElements()) {
-                String headerName = headerNames.nextElement();
+                String headerName = headerNames.nextElement().toString();
                 if (headerName.equalsIgnoreCase(name)) {
                     headers = super.getHeaders(headerName);
                     break;
@@ -250,11 +246,11 @@ public class PortletServletRequestWrapper extends HttpServletRequestWrapper {
             super.setCharacterEncoding(enc);
         } catch (final UnsupportedEncodingException uex) {
             /*
-             * TODO
-             * SUN OpenPortal Portlet Container 2.0_01 BUG which only allows setting an encoding as provided
-             * by underlying request (then: what's the use?) and throws UnsupportedEncodingException
-             * even when that one == null :( ... so, ignoring for now
+             * SUN OpenPortal Portlet Container 2.0_01 BUG which only allows setting an encoding as provided by
+             * underlying request and throws UnsupportedEncodingException even when that one == null
              */
+            LoggerFactory.getLogger(PortletServletRequestWrapper.class).debug(
+                    "Probably vendor specific problem with character encoding, ignoring for now.", uex);
         }
     }
 }

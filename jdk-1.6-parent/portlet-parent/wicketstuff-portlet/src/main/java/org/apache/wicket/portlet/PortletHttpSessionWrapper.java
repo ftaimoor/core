@@ -34,19 +34,17 @@ import java.util.*;
  * Caveat: APPLICATION_SCOPE sessions attributes cannot be used anymore (directly) for inter-portlet
  * communication, or when using Servlets directly which also need to "attach" to the PORTLET_SCOPE
  * session attributes.<br/>
- * The {@link org.apache.portals.bridges.util.PortletWindowUtils} class can help out with that though.<br/>
+ * The {@code org.apache.portals.bridges.util.PortletWindowUtils} class can help out with that though.<br/>
  * Note: copied and adapted from the Apache Portal Bridges Common project
- *
+ * 
  * @author <a href="mailto:ate@douma.nu">Ate Douma</a>
  * @author <a href="http://sebthom.de/">Sebastian Thomschke</a>
  */
-@SuppressWarnings("JavadocReference")
 public class PortletHttpSessionWrapper implements InvocationHandler {
     private static final Logger LOG = LoggerFactory.getLogger(PortletHttpSessionWrapper.class);
 
     private final HttpServletRequest httpServletRequest;
     private final String portletWindowPrefix;
-
 
     private PortletHttpSessionWrapper(final HttpServletRequest httpServletRequest, final String portletWindowPrefix) {
         this.httpServletRequest = httpServletRequest;
@@ -58,30 +56,33 @@ public class PortletHttpSessionWrapper implements InvocationHandler {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Object invoke(final Object proxy, final Method m, final Object[] args) throws Throwable {
-        if (("getAttribute".equals(m.getName()) || "getValue".equals(m.getName())) && args.length == 1 && args[0] instanceof String) {
+        if (("getAttribute".equals(m.getName()) || "getValue".equals(m.getName())) && args.length == 1
+                && args[0] instanceof String) {
             return getHttpSession().getAttribute(portletWindowPrefix + args[0]);
         }
 
-        if (("setAttribute".equals(m.getName()) || "putValue".equals(m.getName())) && args.length == 2 && args[0] instanceof String) {
+        if (("setAttribute".equals(m.getName()) || "putValue".equals(m.getName())) && args.length == 2
+                && args[0] instanceof String) {
             getHttpSession().setAttribute(portletWindowPrefix + args[0], args[1]);
             return null;
         }
 
-        if (("removeAttribute".equals(m.getName()) || "removeValue".equals(m.getName())) && args.length == 1 && args[0] instanceof String) {
+        if (("removeAttribute".equals(m.getName()) || "removeValue".equals(m.getName())) && args.length == 1
+                && args[0] instanceof String) {
             getHttpSession().removeAttribute(portletWindowPrefix + args[0]);
             return null;
         }
 
         if ("getAttributeNames".equals(m.getName()) && args == null) {
-            return new NamespacedNamesEnumeration(getHttpSession().getAttributeNames(), portletWindowPrefix);
+            return new NameSpacedNamesEnumeration(getHttpSession().getAttributeNames(), portletWindowPrefix);
         }
 
         if ("getValueNames".equals(m.getName()) && args == null) {
             final List<String> list = new ArrayList<String>();
-            for (final Enumeration<String> en
-                         = new NamespacedNamesEnumeration(getHttpSession().getAttributeNames(), portletWindowPrefix); en.hasMoreElements(); ) {
+            for (final Enumeration<String> en =
+                    new NameSpacedNamesEnumeration(getHttpSession().getAttributeNames(), portletWindowPrefix); en
+                    .hasMoreElements();) {
                 list.add(en.nextElement());
             }
             return list.toArray(new String[list.size()]);
@@ -89,14 +90,14 @@ public class PortletHttpSessionWrapper implements InvocationHandler {
         return m.invoke(getHttpSession(), args);
     }
 
-    private static class NamespacedNamesEnumeration implements Enumeration<String> {
-        private final Enumeration<String> namesEnumeration;
+    private static class NameSpacedNamesEnumeration implements Enumeration<String> {
+        private final Enumeration<?> namesEnumeration;
         private final String namespace;
 
         private String nextName;
         private boolean isDone;
 
-        public NamespacedNamesEnumeration(final Enumeration<String> namesEnumeration, final String namespace) {
+        public NameSpacedNamesEnumeration(final Enumeration<?> namesEnumeration, final String namespace) {
             this.namesEnumeration = namesEnumeration;
             this.namespace = namespace;
             hasMoreElements();
@@ -109,7 +110,7 @@ public class PortletHttpSessionWrapper implements InvocationHandler {
             }
             if (nextName == null) {
                 while (namesEnumeration.hasMoreElements()) {
-                    final String name = namesEnumeration.nextElement();
+                    final String name = namesEnumeration.nextElement().toString();
                     if (name.startsWith(namespace)) {
                         nextName = name.substring(namespace.length());
                         break;
@@ -146,8 +147,10 @@ public class PortletHttpSessionWrapper implements InvocationHandler {
                 current = null;
             }
         }
-        final Object proxy = Proxy.newProxyInstance(servletSession.getClass().getClassLoader(),
-                interfaces.toArray(new Class[interfaces.size()]), new PortletHttpSessionWrapper(request, portletWindowNamespace));
+        final Object proxy =
+                Proxy.newProxyInstance(servletSession.getClass().getClassLoader(),
+                        interfaces.toArray(new Class[interfaces.size()]), new PortletHttpSessionWrapper(request,
+                                portletWindowNamespace));
         return (HttpSession) proxy;
     }
 }

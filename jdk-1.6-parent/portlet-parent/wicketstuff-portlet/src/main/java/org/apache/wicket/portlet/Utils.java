@@ -26,13 +26,17 @@ import java.util.Map;
 
 /**
  * 100 times already implemented functions (partly taken from Wicket Url)
- *
+ * 
  * @author Peter Pastrnak
  */
 public final class Utils {
     private static final String DEFAULT_CHARSET_NAME = "UTF-8";
 
-    public static final boolean appendParameter(StringBuilder sb, boolean first, String name, String value, boolean encodeURL) {
+    private Utils() {
+    }
+
+    public static boolean appendParameter(StringBuilder sb, boolean first, String name, String value,
+            boolean encodeURL) {
         if (!first) {
             sb.append('&');
         } else {
@@ -53,11 +57,11 @@ public final class Utils {
         return first;
     }
 
-    public static final String buildQueryString(Map<String, String[]> parameterMap) {
+    public static String buildQueryString(Map<String, String[]> parameterMap) {
         return buildQueryString(parameterMap, true);
     }
 
-    public static final String buildQueryString(Map<String, String[]> parameterMap, boolean encodeURL) {
+    public static String buildQueryString(Map<String, String[]> parameterMap, boolean encodeURL) {
         if ((parameterMap == null) || (parameterMap.isEmpty())) {
             return null;
         }
@@ -79,7 +83,7 @@ public final class Utils {
         return sb.toString();
     }
 
-    public static final Map<String, String[]> parseQueryString(String queryString) {
+    public static Map<String, String[]> parseQueryString(String queryString) {
         Map<String, String[]> parameterMap = new HashMap<String, String[]>();
         if (queryString != null) {
             for (String queryParameter : Strings.split(queryString, '&')) {

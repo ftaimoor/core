@@ -31,7 +31,7 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
 /**
- * This class subclasses the original WicketFilter to add the necessary porlet
+ * This class subclasses the original WicketFilter to add the necessary portlet
  * functionality. It is responsible for the initialization of all portlet
  * specific settings of the WebApplication and wraps the portlet request and
  * portlet response objects by an http servlet request / response wrapper.
@@ -41,7 +41,6 @@ import java.io.IOException;
 public class PortletFilter extends WicketFilter {
     public static final String SHARED_RESOURCE_URL_PORTLET_WINDOW_ID_PREFIX = "/ps:";
 
-    private FilterConfig filterConfig;
     private WebApplication application;
 
     /**
@@ -70,7 +69,6 @@ public class PortletFilter extends WicketFilter {
     @Override
     public void init(boolean isServlet, FilterConfig filterConfig) throws ServletException {
         super.init(isServlet, filterConfig);
-        this.filterConfig = filterConfig;
 
         this.application.setRequestCycleProvider(new PortletRequestCycleProvider());
         this.application.getRequestCycleSettings().setRenderStrategy(RenderStrategy.REDIRECT_TO_RENDER);
@@ -80,7 +78,8 @@ public class PortletFilter extends WicketFilter {
     }
 
     @Override
-    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
+    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
+            throws IOException, ServletException {
         HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;
         HttpServletResponse httpServletResponse = (HttpServletResponse) servletResponse;
         String filterPath = getFilterPath(httpServletRequest);
@@ -88,7 +87,8 @@ public class PortletFilter extends WicketFilter {
         PortletRequest portletRequest = (PortletRequest) httpServletRequest.getAttribute("javax.portlet.request");
         if (portletRequest != null) {
             final PortletConfig portletConfig = (PortletConfig) httpServletRequest.getAttribute("javax.portlet.config");
-            final ResponseState responseState = (ResponseState) httpServletRequest.getAttribute(WicketPortlet.RESPONSE_STATE_ATTR);
+            final ResponseState responseState =
+                    (ResponseState) httpServletRequest.getAttribute(WicketPortlet.RESPONSE_STATE_ATTR);
 
             if (portletConfig != null) {
                 if (responseState == null) {
@@ -96,23 +96,27 @@ public class PortletFilter extends WicketFilter {
                     return;
                 }
 
-                HttpSession proxiedSession = PortletHttpSessionWrapper.createProxy(httpServletRequest, portletRequest.getWindowID());
-                httpServletRequest = new PortletServletRequestWrapper(filterConfig.getServletContext(), httpServletRequest, proxiedSession, filterPath);
+                HttpSession proxiedSession =
+                        PortletHttpSessionWrapper.createProxy(httpServletRequest, portletRequest.getWindowID());
+                httpServletRequest = new PortletServletRequestWrapper(httpServletRequest, proxiedSession, filterPath);
                 httpServletResponse = new PortletServletResponseWrapper(httpServletResponse, responseState);
             }
         } else {
             // look for windowId and serve it as a shared resource
 
-            String pathInfo = httpServletRequest.getRequestURI().substring(httpServletRequest.getContextPath().length() + filterPath.length());
+            String pathInfo = httpServletRequest.getRequestURI().substring(
+                    httpServletRequest.getContextPath().length() + filterPath.length());
             if (pathInfo.startsWith(SHARED_RESOURCE_URL_PORTLET_WINDOW_ID_PREFIX)) {
 
                 int nextSeparator = pathInfo.indexOf('/', 1);
                 if (nextSeparator > 0) {
-                    String windowId = new String(Base64.decodeBase64(pathInfo.substring(SHARED_RESOURCE_URL_PORTLET_WINDOW_ID_PREFIX.length(), nextSeparator)));
+                    String windowId = new String(Base64.decodeBase64(pathInfo.substring(
+                            SHARED_RESOURCE_URL_PORTLET_WINDOW_ID_PREFIX.length(), nextSeparator)));
                     HttpSession proxiedSession = PortletHttpSessionWrapper.createProxy(httpServletRequest, windowId);
 
                     pathInfo = pathInfo.substring(nextSeparator);
-                    httpServletRequest = new PortletServletRequestWrapper(filterConfig.getServletContext(), httpServletRequest, proxiedSession, filterPath, pathInfo);
+                    httpServletRequest =
+                            new PortletServletRequestWrapper(httpServletRequest, proxiedSession, filterPath, pathInfo);
                 }
             }
         }
