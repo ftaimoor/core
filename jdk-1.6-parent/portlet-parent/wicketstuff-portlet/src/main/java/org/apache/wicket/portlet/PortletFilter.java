@@ -35,7 +35,7 @@ import java.io.IOException;
  * functionality. It is responsible for the initialization of all portlet
  * specific settings of the WebApplication and wraps the portlet request and
  * portlet response objects by an http servlet request / response wrapper.
- *
+ * 
  * @author Peter Pastrnak
  */
 public class PortletFilter extends WicketFilter {
@@ -46,7 +46,7 @@ public class PortletFilter extends WicketFilter {
 
     /**
      * Hack to access the application object (TODO: remove)
-     *
+     * 
      * @see org.apache.wicket.protocol.http.WicketFilter#getApplicationFactory()
      */
     @Override
@@ -72,6 +72,7 @@ public class PortletFilter extends WicketFilter {
         super.init(isServlet, filterConfig);
         this.filterConfig = filterConfig;
 
+        this.application.setRequestCycleProvider(new PortletRequestCycleProvider());
         this.application.getRequestCycleSettings().setRenderStrategy(RenderStrategy.REDIRECT_TO_RENDER);
         this.application.getRequestCycleSettings().addResponseFilter(new PortletInvalidMarkupFilter());
         this.application.getComponentInitializationListeners().add(new MarkupIdPrepender());
