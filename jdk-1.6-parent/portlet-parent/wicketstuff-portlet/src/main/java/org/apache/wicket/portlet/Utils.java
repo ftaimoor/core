@@ -16,13 +16,12 @@
  */
 package org.apache.wicket.portlet;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.wicket.util.encoding.UrlDecoder;
 import org.apache.wicket.util.encoding.UrlEncoder;
 import org.apache.wicket.util.string.Strings;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * 100 times already implemented functions (partly taken from Wicket Url)
@@ -98,9 +97,10 @@ public final class Utils {
                     if (values == null) {
                         parameterMap.put(parts[0], new String[] { (parts.length > 1 ? parts[1] : null) });
                     } else {
-                        values = Arrays.copyOf(values, values.length + 1);
-                        values[values.length - 1] = (parts.length > 1 ? parts[1] : null);
-                        parameterMap.put(parts[0], values);
+                        String[] newValues = new String[values.length + 1];
+                        System.arraycopy(values, 0, newValues, 0, values.length);
+                        newValues[values.length] = (parts.length > 1 ? parts[1] : null);
+                        parameterMap.put(parts[0], newValues);
                     }
                 }
             }

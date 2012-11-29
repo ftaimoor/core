@@ -16,14 +16,6 @@
  */
 package org.apache.wicket.portlet;
 
-import org.apache.wicket.protocol.http.WicketFilter;
-import org.apache.wicket.settings.IRequestCycleSettings;
-import org.apache.wicket.util.file.File;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.portlet.*;
-import javax.servlet.RequestDispatcher;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
@@ -32,6 +24,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.regex.Pattern;
+
+import javax.portlet.*;
+import javax.servlet.RequestDispatcher;
+
+import org.apache.wicket.protocol.http.WicketFilter;
+import org.apache.wicket.settings.IRequestCycleSettings;
+import org.apache.wicket.util.file.File;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Adapter between the Portlet world requests and the internal Wicket engine. It simulates the web/servlet environment
@@ -185,14 +186,14 @@ public class WicketPortlet extends GenericPortlet {
     }
 
     /**
-     * Loads the Wicket Portlet properties file off the class path.
+     * Loads the WicketPortlet.properties file off the class path.
      * <p/>
      * FIXME javadoc - check properties
      * 
-     * @param properties appends the portlet properties to
+     * @param properties if not null, these ar emerged with the loaded portlet properties
      * @return Wicket portlet properties. Returns an empty or unchanged
-     *         properties object if Wicket Portlet properties could not be found
-     * @throws PortletException if loading the properties fails
+     *         properties object if WicketPortlet.properties could not be found
+     * @throws PortletException if loading of the properties fails
      */
     protected Properties getWicketPortletProperties(Properties properties) throws PortletException {
         if (properties == null) {
@@ -286,7 +287,7 @@ public class WicketPortlet extends GenericPortlet {
 
         wicketFilterPath = buildWicketFilterPath(config.getInitParameter(WICKET_FILTER_PATH_PARAM));
         String responseBufferFolderPath = config.getInitParameter(RESPONSE_BUFFER_FOLDER_PARAM);
-        if ((responseBufferFolderPath != null) && (!responseBufferFolderPath.isEmpty())) {
+        if (responseBufferFolderPath != null && responseBufferFolderPath.length() > 0) {
             responseBufferFolder = new File(responseBufferFolderPath);
         }
 
